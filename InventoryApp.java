@@ -157,6 +157,124 @@ public class InventoryApp {
     }
 
     private static void runAutomatedTestSuite() {
-        System.out.println("\n[Automated Test Suite will be finalized in the next commit]\n");
+        System.out.println("\n==================================================================");
+        System.out.println("            RUNNING AUTOMATED OOP VERIFICATION TESTS              ");
+        System.out.println("==================================================================");
+
+        int passed = 0;
+        int total = 0;
+
+        // Test 1: Stock Addition & Valuation
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            Product p = new Product("T-01", "Test Widget", 10.00, 5);
+            testInv.addProduct(p);
+            testInv.restockProduct("T-01", 10);
+            if (p.getQuantityInStock() == 15 && Math.abs(testInv.calculateTotalInventoryValue() - 150.00) < 0.001) {
+                System.out.println(" [PASS] Test 1: Restocking increases units and updates total valuation ($150.00).");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 1: Restock count or valuation calculation mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 1 encountered exception: " + e.getMessage());
+        }
+
+        // Test 2: Product Sale & Bill Calculation
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            Product p = new Product("T-02", "Gadget", 20.00, 10);
+            testInv.addProduct(p);
+            double bill = testInv.sellProduct("T-02", 3);
+            if (p.getQuantityInStock() == 7 && Math.abs(bill - 60.00) < 0.001) {
+                System.out.println(" [PASS] Test 2: Product sale deducts stock and bills exact subtotal ($60.00 for 3 units).");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 2: Stock deduction or sale bill mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 2 encountered exception: " + e.getMessage());
+        }
+
+        // Test 3: InvalidQuantityException on Negative Restock
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            Product p = new Product("T-03", "Component", 5.00, 10);
+            testInv.addProduct(p);
+            testInv.restockProduct("T-03", -5);
+            System.out.println(" [FAIL] Test 3: Allowed negative restock quantity.");
+        } catch (InvalidQuantityException e) {
+            System.out.println(" [PASS] Test 3: Intercepted InvalidQuantityException on negative restock: " + e.getMessage());
+            passed++;
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 3: Threw unexpected exception type: " + e.getClass().getName());
+        }
+
+        // Test 4: InvalidQuantityException on Insufficient Stock
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            Product p = new Product("T-04", "Battery", 8.00, 4);
+            testInv.addProduct(p);
+            testInv.sellProduct("T-04", 10); // Attempting to purchase 10 when only 4 exist
+            System.out.println(" [FAIL] Test 4: Allowed overselling stock.");
+        } catch (InvalidQuantityException e) {
+            System.out.println(" [PASS] Test 4: Intercepted InvalidQuantityException on insufficient stock: " + e.getMessage());
+            passed++;
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 4: Threw unexpected exception type: " + e.getClass().getName());
+        }
+
+        // Test 5: ProductNotFoundException on Unregistered Item
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            testInv.sellProduct("NON-EXISTENT", 1);
+            System.out.println(" [FAIL] Test 5: Sold unregistered product.");
+        } catch (ProductNotFoundException e) {
+            System.out.println(" [PASS] Test 5: Intercepted ProductNotFoundException: " + e.getMessage());
+            passed++;
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 5: Threw unexpected exception type: " + e.getClass().getName());
+        }
+
+        // Test 6: Perishable Product Markdown Discount
+        total++;
+        try {
+            PerishableProduct milk = new PerishableProduct("PER-01", "Milk", 10.00, 5, 2); // 2 days -> 30% off ($7.00)
+            if (Math.abs(milk.getEffectivePrice() - 7.00) < 0.001 && Math.abs(milk.calculateTotalValue() - 35.00) < 0.001) {
+                System.out.println(" [PASS] Test 6: Perishable item expiring in 2 days applies 30% markdown ($7.00/unit).");
+                passed++;
+            } else {
+                System.out.printf(" [FAIL] Test 6: Discount calculation error. Got $%.2f\n", milk.getEffectivePrice());
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 6 encountered exception: " + e.getMessage());
+        }
+
+        // Test 7: Low Stock Detection
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            testInv.addProduct(new Product("L-01", "Item A", 5.0, 3));
+            testInv.addProduct(new Product("L-02", "Item B", 5.0, 20));
+            java.util.List<Product> low = testInv.getLowStockProducts(5);
+            if (low.size() == 1 && low.get(0).getId().equals("L-01")) {
+                System.out.println(" [PASS] Test 7: Successfully detected low-stock items below threshold.");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 7: Low stock detection mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 7 encountered exception: " + e.getMessage());
+        }
+
+        System.out.println("------------------------------------------------------------------");
+        System.out.printf(" Verification Summary: %d / %d PASSED (%.1f%%)\n",
+                passed, total, ((double) passed / total) * 100);
+        System.out.println("==================================================================\n");
     }
 }
