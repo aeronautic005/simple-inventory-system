@@ -68,6 +68,48 @@ public class Inventory {
     }
 
     /**
+     * Filters and returns products belonging to a specific retail category.
+     */
+    public List<Product> getProductsByCategory(ProductCategory category) {
+        if (category == null) {
+            return Collections.emptyList();
+        }
+        List<Product> matches = new ArrayList<>();
+        for (Product p : products) {
+            if (p.getCategory() == category) {
+                matches.add(p);
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Displays an aggregated statistical summary grouped by retail department category.
+     */
+    public void displayCategorySummary() {
+        System.out.println("\n+-------------------------------------------------------------------------------+");
+        System.out.println("|                       DEPARTMENT CATEGORY AUDIT SUMMARY                       |");
+        System.out.println("+----------------------------+-------------+---------------+--------------------+");
+        System.out.printf("| %-26s | %-11s | %-13s | %-18s |\n", "CATEGORY", "ITEM TYPES", "TOTAL UNITS", "INVENTORY VALUE");
+        System.out.println("+----------------------------+-------------+---------------+--------------------+");
+
+        for (ProductCategory cat : ProductCategory.values()) {
+            List<Product> catItems = getProductsByCategory(cat);
+            if (!catItems.isEmpty()) {
+                int totalUnits = 0;
+                double totalVal = 0.0;
+                for (Product p : catItems) {
+                    totalUnits += p.getQuantityInStock();
+                    totalVal += p.calculateTotalValue();
+                }
+                System.out.printf("| %-26s | %11d | %13d | $%17.2f |\n",
+                        cat.getDisplayName(), catItems.size(), totalUnits, totalVal);
+            }
+        }
+        System.out.println("+----------------------------+-------------+---------------+--------------------+\n");
+    }
+
+    /**
      * Returns a new list of inventory products sorted by unit price.
      * @param ascending true for lowest to highest, false for highest to lowest
      */
