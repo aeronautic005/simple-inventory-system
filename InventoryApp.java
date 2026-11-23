@@ -14,7 +14,7 @@ public class InventoryApp {
 
         while (running) {
             printMainMenu();
-            System.out.print("Enter option (1-8): ");
+            System.out.print("Enter option (1-10): ");
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
@@ -37,14 +37,20 @@ public class InventoryApp {
                     inventory.displaySalesHistory();
                     break;
                 case "7":
-                    runAutomatedTestSuite();
+                    inventory.displayCategorySummary();
                     break;
                 case "8":
+                    handleCsvExport();
+                    break;
+                case "9":
+                    runAutomatedTestSuite();
+                    break;
+                case "10":
                     System.out.println("\nExiting Inventory Management System. Have a great day!\n");
                     running = false;
                     break;
                 default:
-                    System.out.println("\n[!] Invalid choice. Please enter a number between 1 and 8.\n");
+                    System.out.println("\n[!] Invalid choice. Please enter a number between 1 and 10.\n");
             }
         }
     }
@@ -53,21 +59,23 @@ public class InventoryApp {
         System.out.println("==================================================================");
         System.out.println("              SIMPLE INVENTORY MANAGEMENT SYSTEM                  ");
         System.out.println("==================================================================");
-        System.out.println(" [1] View Current Inventory Overview");
-        System.out.println(" [2] Restock Product Units");
-        System.out.println(" [3] Process Product Sale & Bill Customer");
-        System.out.println(" [4] Search Product by Keyword");
-        System.out.println(" [5] Check Low Stock Alerts");
-        System.out.println(" [6] View Sales History & Audit Ledger");
-        System.out.println(" [7] Run Automated OOP Verification Tests");
-        System.out.println(" [8] Exit");
+        System.out.println(" [1]  View Current Inventory Overview");
+        System.out.println(" [2]  Restock Product Units");
+        System.out.println(" [3]  Process Product Sale & Bill Customer");
+        System.out.println(" [4]  Search Product by Keyword");
+        System.out.println(" [5]  Check Low Stock Alerts");
+        System.out.println(" [6]  View Sales History & Audit Ledger");
+        System.out.println(" [7]  Department Category Summary");
+        System.out.println(" [8]  Export Inventory Catalog to CSV");
+        System.out.println(" [9]  Run Automated OOP Verification Tests");
+        System.out.println(" [10] Exit");
         System.out.println("==================================================================");
     }
 
     private static void seedSampleInventory() {
-        inventory.addProduct(new Product("P-101", "Wireless Optical Mouse", 15.50, 40));
-        inventory.addProduct(new Product("P-102", "Mechanical Keyboard", 65.00, 15));
-        inventory.addProduct(new Product("P-103", "USB-C Flash Drive 64GB", 12.00, 5));
+        inventory.addProduct(new Product("P-101", "Wireless Optical Mouse", 15.50, 40, ProductCategory.ELECTRONICS));
+        inventory.addProduct(new Product("P-102", "Mechanical Keyboard", 65.00, 15, ProductCategory.ELECTRONICS));
+        inventory.addProduct(new Product("P-103", "USB-C Flash Drive 64GB", 12.00, 5, ProductCategory.ELECTRONICS));
 
         // Perishable goods with varying expiration days
         inventory.addProduct(new PerishableProduct("PER-201", "Organic Whole Milk 1L", 3.50, 20, 2)); // 30% discount
@@ -77,6 +85,9 @@ public class InventoryApp {
         // Electronic items with manufacturer warranties and handling fees
         inventory.addProduct(new ElectronicProduct("ELE-301", "27-inch 4K Gaming Monitor", 300.00, 10, 24));
         inventory.addProduct(new ElectronicProduct("ELE-302", "Noise-Cancelling Headphones", 120.00, 18, 12));
+
+        // Fragile items with protective packaging surcharges
+        inventory.addProduct(new FragileProduct("FRG-401", "Porcelain Dinnerware Set", 85.00, 8, 12.50, "Double-Cushioned"));
     }
 
     private static void handleRestock() {
@@ -123,13 +134,13 @@ public class InventoryApp {
 
         try {
             double totalBill = inventory.sellProduct(id, quantity);
-            Product p = inventory.findProductById(id);
-            System.out.println("\n====================== SALE RECEIPT ======================");
-            System.out.printf(" Product       : %s [%s]\n", p.getName(), p.getId());
-            System.out.printf(" Quantity Sold : %d unit(s)\n", quantity);
-            System.out.printf(" Total Amount  : $%7.2f\n", totalBill);
-            System.out.printf(" Remaining Stk : %d unit(s)\n", p.getQuantityInStock());
-            System.out.println("==========================================================\n");
+            java.util.List<SaleRecord> history = inventory.getSalesHistory();
+            if (!history.isEmpty()) {
+                SaleRecord latest = history.get(history.size() - 1);
+                System.out.println("\n" + latest.generateItemizedReceipt());
+            } else {
+                System.out.printf("[+] Successfully sold %d unit(s). Total: $%.2f\n\n", quantity, totalBill);
+            }
         } catch (ProductNotFoundException | InvalidQuantityException e) {
             System.out.println("[!] SALE REJECTED: " + e.getMessage() + "\n");
         }
@@ -162,6 +173,14 @@ public class InventoryApp {
             } catch (NumberFormatException ignored) {}
         }
         inventory.displayLowStockAlerts(threshold);
+    }
+
+    private static void handleCsvExport() {
+        System.out.println("\n----------------- EXPORT INVENTORY CSV --------------------");
+        String csv = inventory.exportInventoryToCSV();
+        System.out.println(csv);
+        System.out.println("[+] CSV export complete. You can copy the raw text above for spreadsheets.");
+        System.out.println("-----------------------------------------------------------\n");
     }
 
     private static void runAutomatedTestSuite() {
