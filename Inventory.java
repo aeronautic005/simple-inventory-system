@@ -161,6 +161,37 @@ public class Inventory {
     }
 
     /**
+     * Replenishes multiple product stocks in a single batch operation.
+     * @param restockManifest map of product ID to quantity
+     * @return total units added across all products
+     * @throws ProductNotFoundException if any specified product ID is missing
+     * @throws InvalidQuantityException if any quantity is non-positive
+     */
+    public int bulkRestock(java.util.Map<String, Integer> restockManifest)
+            throws ProductNotFoundException, InvalidQuantityException {
+        if (restockManifest == null || restockManifest.isEmpty()) {
+            return 0;
+        }
+        // First pass: validation
+        for (java.util.Map.Entry<String, Integer> entry : restockManifest.entrySet()) {
+            if (findProductById(entry.getKey()) == null) {
+                throw new ProductNotFoundException(entry.getKey(), "Batch restock aborted due to missing product.");
+            }
+            if (entry.getValue() <= 0) {
+                throw new InvalidQuantityException(entry.getValue(), "Restock quantity in batch must be positive.");
+            }
+        }
+        // Second pass: apply
+        int totalUnits = 0;
+        for (java.util.Map.Entry<String, Integer> entry : restockManifest.entrySet()) {
+            Product p = findProductById(entry.getKey());
+            p.addStock(entry.getValue());
+            totalUnits += entry.getValue();
+        }
+        return totalUnits;
+    }
+
+    /**
      * Processes customer purchase and deducts inventory stock.
      * @param productId product unique barcode or ID
      * @param quantity number of units being purchased
