@@ -8,12 +8,17 @@ public class Product {
     protected double unitPrice;
     protected int quantityInStock;
     protected ProductCategory category;
+    protected String supplierId;
 
     public Product(String id, String name, double unitPrice, int initialStock) {
         this(id, name, unitPrice, initialStock, ProductCategory.GENERAL);
     }
 
     public Product(String id, String name, double unitPrice, int initialStock, ProductCategory category) {
+        this(id, name, unitPrice, initialStock, category, "SUP-DIRECT");
+    }
+
+    public Product(String id, String name, double unitPrice, int initialStock, ProductCategory category, String supplierId) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty.");
         }
@@ -32,6 +37,15 @@ public class Product {
         this.unitPrice = unitPrice;
         this.quantityInStock = initialStock;
         this.category = (category == null) ? ProductCategory.GENERAL : category;
+        this.supplierId = (supplierId == null || supplierId.trim().isEmpty()) ? "SUP-DIRECT" : supplierId.trim();
+    }
+
+    public String getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(String supplierId) {
+        this.supplierId = (supplierId == null || supplierId.trim().isEmpty()) ? "SUP-DIRECT" : supplierId.trim();
     }
 
     public ProductCategory getCategory() {
