@@ -80,6 +80,20 @@ public class Inventory {
         return sorted;
     }
 
+    /**
+     * Returns a new list of inventory products sorted by stock count on hand.
+     * Useful for prioritizing depleted items for warehouse restocking.
+     * @param ascending true for lowest stock first, false for highest stock first
+     */
+    public List<Product> getProductsSortedByStock(boolean ascending) {
+        List<Product> sorted = new ArrayList<>(products);
+        sorted.sort((p1, p2) -> {
+            int cmp = Integer.compare(p1.getQuantityInStock(), p2.getQuantityInStock());
+            return ascending ? cmp : -cmp;
+        });
+        return sorted;
+    }
+
     public int getTotalProductCount() {
         return products.size();
     }
