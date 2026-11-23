@@ -6,7 +6,7 @@ public class PerishableProduct extends Product {
     private int daysUntilExpiration;
 
     public PerishableProduct(String id, String name, double unitPrice, int initialStock, int daysUntilExpiration) {
-        super(id, name, unitPrice, initialStock);
+        super(id, name, unitPrice, initialStock, ProductCategory.GROCERY);
         this.daysUntilExpiration = Math.max(0, daysUntilExpiration);
     }
 

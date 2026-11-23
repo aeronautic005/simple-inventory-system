@@ -12,7 +12,7 @@ public class ElectronicProduct extends Product {
 
     public ElectronicProduct(String id, String name, double unitPrice, int initialStock,
                              int warrantyMonths, double warrantyFeeRate) {
-        super(id, name, unitPrice, initialStock);
+        super(id, name, unitPrice, initialStock, ProductCategory.ELECTRONICS);
         this.warrantyMonths = Math.max(0, warrantyMonths);
         this.warrantyFeeRate = Math.max(0.0, warrantyFeeRate);
     }

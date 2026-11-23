@@ -7,8 +7,13 @@ public class Product {
     protected String name;
     protected double unitPrice;
     protected int quantityInStock;
+    protected ProductCategory category;
 
     public Product(String id, String name, double unitPrice, int initialStock) {
+        this(id, name, unitPrice, initialStock, ProductCategory.GENERAL);
+    }
+
+    public Product(String id, String name, double unitPrice, int initialStock, ProductCategory category) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty.");
         }
@@ -26,6 +31,15 @@ public class Product {
         this.name = name.trim();
         this.unitPrice = unitPrice;
         this.quantityInStock = initialStock;
+        this.category = (category == null) ? ProductCategory.GENERAL : category;
+    }
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductCategory category) {
+        this.category = (category == null) ? ProductCategory.GENERAL : category;
     }
 
     public String getId() {
