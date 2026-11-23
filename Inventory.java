@@ -94,6 +94,27 @@ public class Inventory {
         return sorted;
     }
 
+    /**
+     * Applies a promotional percentage discount across all products in a category.
+     * @param category department category
+     * @param discountPercent percentage markdown (e.g., 10.0 for 10% off)
+     * @return number of affected products
+     */
+    public int applyCategoryDiscount(ProductCategory category, double discountPercent) {
+        if (discountPercent <= 0.0 || discountPercent >= 100.0) {
+            throw new IllegalArgumentException("Discount percent must be strictly between 0 and 100.");
+        }
+        int count = 0;
+        double factor = 1.0 - (discountPercent / 100.0);
+        for (Product p : products) {
+            if (p.getCategory() == category) {
+                p.setUnitPrice(p.getUnitPrice() * factor);
+                count++;
+            }
+        }
+        return count;
+    }
+
     public int getTotalProductCount() {
         return products.size();
     }
