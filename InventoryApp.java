@@ -14,7 +14,7 @@ public class InventoryApp {
 
         while (running) {
             printMainMenu();
-            System.out.print("Enter option (1-7): ");
+            System.out.print("Enter option (1-8): ");
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
@@ -34,14 +34,17 @@ public class InventoryApp {
                     handleLowStockCheck();
                     break;
                 case "6":
-                    runAutomatedTestSuite();
+                    inventory.displaySalesHistory();
                     break;
                 case "7":
+                    runAutomatedTestSuite();
+                    break;
+                case "8":
                     System.out.println("\nExiting Inventory Management System. Have a great day!\n");
                     running = false;
                     break;
                 default:
-                    System.out.println("\n[!] Invalid choice. Please enter a number between 1 and 7.\n");
+                    System.out.println("\n[!] Invalid choice. Please enter a number between 1 and 8.\n");
             }
         }
     }
@@ -55,8 +58,9 @@ public class InventoryApp {
         System.out.println(" [3] Process Product Sale & Bill Customer");
         System.out.println(" [4] Search Product by Keyword");
         System.out.println(" [5] Check Low Stock Alerts");
-        System.out.println(" [6] Run Automated OOP Verification Tests");
-        System.out.println(" [7] Exit");
+        System.out.println(" [6] View Sales History & Audit Ledger");
+        System.out.println(" [7] Run Automated OOP Verification Tests");
+        System.out.println(" [8] Exit");
         System.out.println("==================================================================");
     }
 
@@ -69,6 +73,10 @@ public class InventoryApp {
         inventory.addProduct(new PerishableProduct("PER-201", "Organic Whole Milk 1L", 3.50, 20, 2)); // 30% discount
         inventory.addProduct(new PerishableProduct("PER-202", "Artisan Sourdough Bread", 4.50, 8, 5)); // 15% discount
         inventory.addProduct(new PerishableProduct("PER-203", "Greek Yogurt 500g", 2.80, 25, 14));   // Full price
+
+        // Electronic items with manufacturer warranties and handling fees
+        inventory.addProduct(new ElectronicProduct("ELE-301", "27-inch 4K Gaming Monitor", 300.00, 10, 24));
+        inventory.addProduct(new ElectronicProduct("ELE-302", "Noise-Cancelling Headphones", 120.00, 18, 12));
     }
 
     private static void handleRestock() {

@@ -8,9 +8,11 @@ import java.util.List;
  */
 public class Inventory {
     private final List<Product> products;
+    private final List<SaleRecord> salesHistory;
 
     public Inventory() {
         this.products = new ArrayList<>();
+        this.salesHistory = new ArrayList<>();
     }
 
     /**
@@ -116,8 +118,60 @@ public class Inventory {
         double unitPrice = product.getUnitPrice();
         if (product instanceof PerishableProduct) {
             unitPrice = ((PerishableProduct) product).getEffectivePrice();
+        } else if (product instanceof ElectronicProduct) {
+            unitPrice = ((ElectronicProduct) product).getEffectivePrice();
         }
-        return unitPrice * quantity;
+
+        double totalBill = unitPrice * quantity;
+        SaleRecord record = new SaleRecord(product.getId(), product.getName(), quantity, unitPrice, totalBill);
+        salesHistory.add(record);
+        return totalBill;
+    }
+
+    public List<SaleRecord> getSalesHistory() {
+        return Collections.unmodifiableList(salesHistory);
+    }
+
+    /**
+     * Calculates the cumulative revenue generated from all recorded sales.
+     */
+    public double getTotalRevenueCollected() {
+        double revenue = 0.0;
+        for (SaleRecord record : salesHistory) {
+            revenue += record.getTotalAmount();
+        }
+        return revenue;
+    }
+
+    /**
+     * Prints an itemized ASCII ledger of all recorded sales transactions.
+     */
+    public void displaySalesHistory() {
+        System.out.println("\n==========================================================================================");
+        System.out.println("                              SALES TRANSACTION AUDIT LEDGER                              ");
+        System.out.println("==========================================================================================");
+        System.out.printf("| %-10s | %-8s | %-24s | %-5s | %-10s | %-19s |\n",
+                "TXN ID", "PROD ID", "PRODUCT NAME", "QTY", "TOTAL PAID", "TIMESTAMP");
+        System.out.println("+------------+----------+--------------------------+-------+------------+---------------------+");
+
+        if (salesHistory.isEmpty()) {
+            System.out.println("|                              No sales recorded yet.                                     |");
+        } else {
+            for (SaleRecord record : salesHistory) {
+                String nameCut = record.getProductName();
+                if (nameCut.length() > 24) {
+                    nameCut = nameCut.substring(0, 21) + "...";
+                }
+                System.out.printf("| %-10s | %-8s | %-24s | %5d | $%9.2f | %-19s |\n",
+                        record.getTransactionId(), record.getProductId(), nameCut,
+                        record.getQuantitySold(), record.getTotalAmount(), record.getTimestamp());
+            }
+        }
+
+        System.out.println("+------------+----------+--------------------------+-------+------------+---------------------+");
+        System.out.printf("| Total Completed Transactions: %-3d                    Total Revenue Collected: $%11.2f |\n",
+                salesHistory.size(), getTotalRevenueCollected());
+        System.out.println("==========================================================================================\n");
     }
 
     /**
