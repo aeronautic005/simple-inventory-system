@@ -330,6 +330,74 @@ public class InventoryApp {
             System.out.println(" [FAIL] Test 9 encountered exception: " + e.getMessage());
         }
 
+        // Test 10: Fragile Product Packaging Fee
+        total++;
+        try {
+            FragileProduct glass = new FragileProduct("T-FRG1", "Vase", 50.00, 2, 5.00, "Cushioned");
+            if (Math.abs(glass.getEffectivePrice() - 55.00) < 0.001 && Math.abs(glass.calculateTotalValue() - 110.00) < 0.001) {
+                System.out.println(" [PASS] Test 10: Fragile item calculates protective packaging surcharge ($55.00 unit, $110.00 total).");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 10: Fragile pricing calculation mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 10 encountered exception: " + e.getMessage());
+        }
+
+        // Test 11: Category Promotional Markdown
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            Product p1 = new Product("T-AP1", "Shirt", 40.00, 10, ProductCategory.APPAREL);
+            testInv.addProduct(p1);
+            int updated = testInv.applyCategoryDiscount(ProductCategory.APPAREL, 25.0); // 25% off -> $30.00
+            if (updated == 1 && Math.abs(p1.getUnitPrice() - 30.00) < 0.001) {
+                System.out.println(" [PASS] Test 11: Promotional department discount applied (25% off Apparel -> $30.00).");
+                passed++;
+            } else {
+                System.out.printf(" [FAIL] Test 11: Category discount calculation error. Got $%.2f\n", p1.getUnitPrice());
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 11 encountered exception: " + e.getMessage());
+        }
+
+        // Test 12: Price Sorting Logic
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            testInv.addProduct(new Product("T-P1", "Cheap Item", 5.00, 10));
+            testInv.addProduct(new Product("T-P2", "Pricey Item", 95.00, 10));
+            java.util.List<Product> sortedAsc = testInv.getProductsSortedByPrice(true);
+            if (sortedAsc.get(0).getUnitPrice() == 5.00 && sortedAsc.get(1).getUnitPrice() == 95.00) {
+                System.out.println(" [PASS] Test 12: Price sorting accurately orders items ascending by unit price.");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 12: Price sorting mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 12 encountered exception: " + e.getMessage());
+        }
+
+        // Test 13: Bulk Restocking Operation
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            testInv.addProduct(new Product("T-B1", "Batch 1", 10.00, 5));
+            testInv.addProduct(new Product("T-B2", "Batch 2", 10.00, 5));
+            java.util.Map<String, Integer> manifest = new java.util.HashMap<>();
+            manifest.put("T-B1", 10);
+            manifest.put("T-B2", 15);
+            int units = testInv.bulkRestock(manifest);
+            if (units == 25 && testInv.findProductById("T-B1").getQuantityInStock() == 15 && testInv.findProductById("T-B2").getQuantityInStock() == 20) {
+                System.out.println(" [PASS] Test 13: Bulk restocking successfully replenished multiple product inventories (25 units added).");
+                passed++;
+            } else {
+                System.out.println(" [FAIL] Test 13: Bulk restock quantity mismatch.");
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 13 encountered exception: " + e.getMessage());
+        }
+
         System.out.println("------------------------------------------------------------------");
         System.out.printf(" Verification Summary: %d / %d PASSED (%.1f%%)\n",
                 passed, total, ((double) passed / total) * 100);
