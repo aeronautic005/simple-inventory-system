@@ -115,6 +115,20 @@ public class Inventory {
         return count;
     }
 
+    /**
+     * Exports current inventory catalog into a standard CSV data string.
+     */
+    public String exportInventoryToCSV() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Product ID,Product Name,Category,Unit Price,Quantity in Stock,Total Value,Supplier ID\n");
+        for (Product p : products) {
+            sb.append(String.format("\"%s\",\"%s\",\"%s\",%.2f,%d,%.2f,\"%s\"\n",
+                    p.getId(), p.getName(), p.getCategory().getDisplayName(),
+                    p.getUnitPrice(), p.getQuantityInStock(), p.calculateTotalValue(), p.getSupplierId()));
+        }
+        return sb.toString();
+    }
+
     public int getTotalProductCount() {
         return products.size();
     }
