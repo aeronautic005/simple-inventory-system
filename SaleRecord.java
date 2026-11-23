@@ -62,4 +62,29 @@ public class SaleRecord {
         return String.format("[%s] %s (%d units @ $%.2f) = $%.2f at %s",
                 transactionId, productName, quantitySold, unitPriceCharged, totalAmount, timestamp);
     }
+
+    /**
+     * Formats an itemized ASCII customer receipt.
+     */
+    public String generateItemizedReceipt() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("========================================================\n");
+        sb.append("               OFFICIAL SALES CHECKOUT RECEIPT          \n");
+        sb.append("========================================================\n");
+        sb.append(String.format(" Transaction ID : %-37s\n", transactionId));
+        sb.append(String.format(" Timestamp      : %-37s\n", timestamp));
+        sb.append("--------------------------------------------------------\n");
+        sb.append(String.format(" Product ID     : %-37s\n", productId));
+        sb.append(String.format(" Product Name   : %-37s\n", productName));
+        sb.append(String.format(" Unit Price     : $%10.2f\n", unitPriceCharged));
+        sb.append(String.format(" Quantity Sold  : %10d unit(s)\n", quantitySold));
+        sb.append("--------------------------------------------------------\n");
+        sb.append(String.format(" TOTAL BILLED   : $%10.2f\n", totalAmount));
+        sb.append("========================================================\n");
+        sb.append("               ||| ||||| |||| || |||||| ||              \n");
+        sb.append(String.format("                   *%s*                         \n", transactionId));
+        sb.append("           Thank you for your business!                 \n");
+        sb.append("========================================================\n");
+        return sb.toString();
+    }
 }
