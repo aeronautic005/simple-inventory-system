@@ -67,6 +67,19 @@ public class Inventory {
         return Collections.unmodifiableList(products);
     }
 
+    /**
+     * Returns a new list of inventory products sorted by unit price.
+     * @param ascending true for lowest to highest, false for highest to lowest
+     */
+    public List<Product> getProductsSortedByPrice(boolean ascending) {
+        List<Product> sorted = new ArrayList<>(products);
+        sorted.sort((p1, p2) -> {
+            int cmp = Double.compare(p1.getUnitPrice(), p2.getUnitPrice());
+            return ascending ? cmp : -cmp;
+        });
+        return sorted;
+    }
+
     public int getTotalProductCount() {
         return products.size();
     }
