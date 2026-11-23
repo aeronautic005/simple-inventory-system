@@ -280,6 +280,37 @@ public class InventoryApp {
             System.out.println(" [FAIL] Test 7 encountered exception: " + e.getMessage());
         }
 
+        // Test 8: Electronic Product Effective Price & Handling Fee
+        total++;
+        try {
+            ElectronicProduct monitor = new ElectronicProduct("T-ELE1", "Gaming Monitor", 200.00, 4, 12, 0.05); // 5% fee ($210.00)
+            if (Math.abs(monitor.getEffectivePrice() - 210.00) < 0.001 && Math.abs(monitor.calculateTotalValue() - 840.00) < 0.001) {
+                System.out.println(" [PASS] Test 8: Electronic product calculates 5% warranty handling fee ($210.00 unit, $840.00 total).");
+                passed++;
+            } else {
+                System.out.printf(" [FAIL] Test 8: Effective price mismatch. Got $%.2f\n", monitor.getEffectivePrice());
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 8 encountered exception: " + e.getMessage());
+        }
+
+        // Test 9: Sales History Recording and Revenue Accumulation
+        total++;
+        try {
+            Inventory testInv = new Inventory();
+            testInv.addProduct(new Product("T-S1", "Item S1", 25.00, 10));
+            testInv.sellProduct("T-S1", 2); // $50.00
+            testInv.sellProduct("T-S1", 1); // $25.00
+            if (testInv.getSalesHistory().size() == 2 && Math.abs(testInv.getTotalRevenueCollected() - 75.00) < 0.001) {
+                System.out.println(" [PASS] Test 9: Sales ledger records transactions and accumulates revenue ($75.00 across 2 sales).");
+                passed++;
+            } else {
+                System.out.printf(" [FAIL] Test 9: Revenue ledger mismatch. Got $%.2f\n", testInv.getTotalRevenueCollected());
+            }
+        } catch (Exception e) {
+            System.out.println(" [FAIL] Test 9 encountered exception: " + e.getMessage());
+        }
+
         System.out.println("------------------------------------------------------------------");
         System.out.printf(" Verification Summary: %d / %d PASSED (%.1f%%)\n",
                 passed, total, ((double) passed / total) * 100);
